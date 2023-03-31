@@ -288,7 +288,7 @@ deleteBtn.addEventListener('click', () => {
 const getAllButton = document.querySelector('#getAllButton');
 getAllButton.addEventListener('click', () => {
   // retrieve all data from api endpoint
-  fetch('http://localhost:3000/api/data')
+  fetch('http:// 192.168.0.155:3000/api/data')
     .then(response => response.json())
     .then(data => {
       // do something with the data
