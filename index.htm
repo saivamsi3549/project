@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Fetch and Post Data</title>
+</head>
+<style>
+  form {
+    margin: 0 auto;
+    max-width: 400px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f8f8f8;
+}
+
+label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+input[type="text"], input[type="date"], input[type="time"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    box-sizing: border-box;
+    font-size: 16px;
+}
+
+input[type="submit"] {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+input[type="submit"]:hover {
+    background-color: #3e8e41;
+}
+
+input[type="submit"]:active {
+    background-color: #367023;
+}
+input[type="button"] {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+input[type="button"]:hover {
+    background-color: #3e8e41;
+}
+
+input[type="button"]:active {
+    background-color: #367023;
+}
+
+</style>
+
+<body>
+    <h1>Fetch and Post Data Example</h1>
+    <form id="myForm" >
+        <label for="reader-id">Reader ID:</label>
+        <input type="text" id="ReaderID" name="readerid"><br>
+        <label for="version">Version:</label>
+        <input type="text" id="Version" name="version"><br>
+        <!-- <label for="date">Date:</label>
+        <input type="date" id="Date" name="date"><br>
+        <label for="time">Time:</label>
+        <input type="time" id="Time" name="time"><br> -->
+        <label for="signal-strength">Signal Strength:</label>
+        <input type="text" id="Signalstrength" name="signal_strength"><br>
+        <label for="imei">IMEI:</label>
+        <input type="text" id="IMEI" name="imei"><br>
+        <label for="tag-id">Tag ID:</label>
+        <input type="text" id="TagID" name="tag_id"><br>
+        <label for="amount">Amount:</label>
+        <input type="text" id="Amount" name="amount"><br>
+        <input type="submit" value="Submit" >
+        <input type="button"  value="getdata" id="getDataButton">
+       <input type="button" value="update" id="updateButton">
+       <input type="button" value="delete" id="delete"><br><br>
+       <input type="button" value="Getall" id="getAllButton">
+       
+       
+    </form>
+    
+    
+    
+    
+    <script>
+        const postform = document.querySelector('#myForm');
+
+postform.addEventListener('submit', (event) => {
+  event.preventDefault(); // prevent the default form submission behavior
+  
+
+  const ReaderID = document.querySelector('#ReaderID').value;
+  const Version = document.querySelector('#Version').value;
+  // const Date = document.querySelector('#Date').value;
+  // const Time = document.querySelector('#Time').value;
+  const Signalstrength = document.querySelector('#Signalstrength').value;
+  const IMEI = document.querySelector('#IMEI').value;
+  const TagID = document.querySelector('#TagID').value;
+  const Amount = document.querySelector('#Amount').value;
+  if (!ReaderID || !Version  || !Signalstrength || !IMEI || !TagID || !Amount) {
+    alert('All fields are required');
+    return;}
+  fetch('http://localhost:3000/api/post', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ ReaderID,Version,Signalstrength,IMEI,TagID,Amount })
+  })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log(data);
+      alert("Data added succesfully to Database");
+      postform.reset();
+
+      
+      // handle successful response from the server
+    })
+    .catch(error => {
+      console.error('There was a problem with the fetch operation:', error);
+      // handle error from the server
+      alert(`Tag ID ${TagID} already exists in the database.`)
+      
+    });
+});
+</script>
+<!-- //////////////////////////////////////////////////////// -->
+  <script>
+    
+    const getButton = document.querySelector('#getDataButton');
+
+getButton.addEventListener('click', (event) => {
+  event.preventDefault(); // prevent the default form submission behavior
+
+  const tagId = document.querySelector('#TagID').value;
+  if (tagId === null || tagId === '') {
+    alert('Tag ID cannot be empty');
+    return;
+  }
+  const url = `http://localhost:3000/api/data/${tagId}`;
+
+  fetch(url)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log(data);
+      if (data.length === 0) {
+        alert('No data found for the given tag ID');
+      } else {
+        document.querySelector('#ReaderID').value = data[0].ReaderID;
+        document.querySelector('#Version').value = data[0].Version;
+        document.querySelector('#Signalstrength').value = data[0].Signalstrength;
+        document.querySelector('#IMEI').value = data[0].IMEI;
+        document.querySelector('#Amount').value = data[0].Amount;
+      }
+    })
+    .catch(error => {
+      console.error('There was a problem with the fetch operation:', error);
+    });
+});
+</script>
+<!-- ///////////////////////////////////////////////////////// -->
+<script>
+  const updateButton = document.querySelector('#updateButton');
+  const form = document.querySelector('#myForm');
+
+updateButton.addEventListener('click', (event) => {
+  event.preventDefault();
+
+  const tagId = document.querySelector('#TagID').value;
+  const readerId = document.querySelector('#ReaderID').value;
+  const version = document.querySelector('#Version').value;
+  const signalStrength = document.querySelector('#Signalstrength').value;
+  const imei = document.querySelector('#IMEI').value;
+  const amount = document.querySelector('#Amount').value;
+
+  const data = {
+    ReaderID: readerId,
+    Version: version,
+    Signalstrength: signalStrength,
+    IMEI: imei,
+    Amount: amount,
+  };
+
+  fetch(`http://localhost:3000/api/data/${tagId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
+    .then((data) => {
+      console.log(data);
+      alert(data.success);
+      form.reset();
+      // update UI to indicate success
+    })
+    .catch((error) => {
+      console.error('There was an error updating the data:', error);
+      // update UI to indicate error
+    });
+});
+
+</script>
+<!-- ////////////////////////////////////////////////////////////////////// -->
+    <script>
+      
+    // select the delete button element
+const deleteBtn = document.querySelector('#delete');
+const form1 = document.querySelector('#myForm')
+// add event listener to the delete button
+deleteBtn.addEventListener('click', () => {
+  const tagId = document.querySelector('#TagID').value;
+
+  // send DELETE request to the API endpoint
+  fetch(`http://localhost:3000/api/data/${tagId}`, {
+    method: 'DELETE',
+  })
+    .then(response => {
+      if (response.ok) {
+        console.log('Data successfully deleted from the database.');
+        return response.json();
+      } else {
+        console.log('There was an error deleting the data.');
+      }
+    })
+    .then(data => {
+      if (data.success) {
+        alert(data.success);
+        form1.reset();
+      } else {
+        console.log('There was an error deleting the data.');
+      }
+    })
+    .catch(error => console.error(error));
+});
+
+    </script>
+    <script>
+//      const getAllButton = document.querySelector('#getAllButton');
+
+// getAllButton.addEventListener('click', () => {
+//   // Retrieve all data from API endpoint
+//   fetch('http://localhost:3000/api/data')
+//     .then(response => response.json())
+//     .then(data => {
+//       console.log(data)
+//       // Store data array in browser storage
+//       localStorage.setItem('allData', JSON.stringify(data));
+//       // Navigate to new HTML page
+//       window.location.href = 'display-data.html';
+//     })
+//     .catch(error => {
+//       console.error('Error retrieving data:', error);
+//     });
+// });
+const getAllButton = document.querySelector('#getallbutton');
+getAllButton.addEventListener('click', () => {
+  // retrieve all data from api endpoint
+  fetch('http://localhost:3000/api/data')
+    .then(response => response.json())
+    .then(data => {
+      // do something with the data
+      console.log(data);
+    })
+    .catch(error => {
+      // handle errors
+      console.error(error);
+    });
+});
+    </script>
+</body>
+</html>
+
+

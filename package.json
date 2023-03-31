@@ -1,0 +1,23 @@
+{
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "helmet": "^6.0.1",
+    "morgan": "^1.10.0",
+    "msnodesqlv8": "^3.0.1",
+    "mssql": "^9.1.1",
+    "nodemon": "^2.0.20"
+  },
+  "name": "sai",
+  "version": "1.0.0",
+  "main": "api.js",
+  "scripts": {
+    "start": "node api.js",
+    "server": "nodemon api.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
